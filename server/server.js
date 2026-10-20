@@ -9,11 +9,21 @@ const applicationRoutes = require('./routes/applicationRoutes');
 const app = express();
 
 // CORS lets the React app (different origin/port) call this API.
-// If CLIENT_URL is set we only allow that origin, otherwise allow all (local dev).
+// If CLIENT_URL is set we only allow that origin, otherwise allow all.
 app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
 
 // Parses JSON request bodies into req.body
 app.use(express.json());
+
+// Ensure MongoDB is connected before handling requests (required for serverless/Vercel)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ message: 'Database connection failed' });
+  }
+});
 
 // Simple health check route
 app.get('/', (req, res) => {
@@ -37,7 +47,11 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB first, then start listening for requests
-connectDB().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-});
+// Connect to MongoDB and listen on port when not running serverless on Vercel
+if (!process.env.VERCEL) {
+  connectDB().then(() => {
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  });
+}
+
+module.exports = app;
