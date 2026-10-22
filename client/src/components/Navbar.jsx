@@ -7,8 +7,10 @@ function Navbar() {
 
   function handleLogout() {
     logout();
-    navigate('/login');
+    navigate('/');
   }
+
+  const initial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
 
   return (
     <header className="topbar">
@@ -17,14 +19,25 @@ function Navbar() {
           <span className="brand-icon">R</span>
           <span className="brand-name">Rolevo</span>
         </Link>
-        {user && (
+
+        {user ? (
           <div className="topbar-user">
             <span className="user-badge">
-              <span>👤</span> {user.name}
+              <span className="user-avatar">{initial}</span>
+              <span>{user.name}</span>
             </span>
-            <button className="btn btn-small" onClick={handleLogout}>
+            <button className="btn btn-small" onClick={handleLogout} title="Sign out of Rolevo">
               Logout
             </button>
+          </div>
+        ) : (
+          <div className="topbar-user">
+            <Link to="/login" className="btn btn-small" style={{ border: 'none', background: 'transparent' }}>
+              Sign In
+            </Link>
+            <Link to="/register" className="btn btn-primary btn-small">
+              Register for Free
+            </Link>
           </div>
         )}
       </div>

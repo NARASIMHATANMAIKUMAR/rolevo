@@ -82,51 +82,58 @@ function ApplicationForm() {
     }
   }
 
-  if (loading) return <p className="muted">Loading...</p>;
+  if (loading) return <p className="muted" style={{ padding: '32px', textAlign: 'center' }}>Loading application...</p>;
 
   return (
-    <div className="panel form-panel">
-      <div className="page-header">
-        <h1 className="page-title">{isEdit ? 'Edit application' : 'Add application'}</h1>
-        <Link to={isEdit ? `/applications/${id}` : '/'}>Cancel</Link>
+    <div className="panel form-panel" style={{ margin: '0 auto' }}>
+      <div className="page-header" style={{ marginBottom: '20px' }}>
+        <div>
+          <h1 className="page-title">{isEdit ? 'Edit Application' : 'Add New Application'}</h1>
+          <p className="muted small" style={{ margin: '2px 0 0' }}>
+            {isEdit ? 'Update details and salary expectations' : 'Track an active job application'}
+          </p>
+        </div>
+        <Link to={isEdit ? `/applications/${id}` : '/'} className="btn btn-small">
+          Cancel
+        </Link>
       </div>
 
       {error && <div className="alert">{error}</div>}
 
       <form onSubmit={handleSubmit} className="form form-grid">
         <label>
-          Company *
-          <input name="company" value={form.company} onChange={handleChange} required />
+          Company Name *
+          <input name="company" value={form.company} onChange={handleChange} placeholder="e.g. Google" required />
         </label>
         <label>
-          Role *
-          <input name="role" value={form.role} onChange={handleChange} required />
+          Role / Job Title *
+          <input name="role" value={form.role} onChange={handleChange} placeholder="e.g. Senior Frontend Engineer" required />
         </label>
         <label>
           Location
-          <input name="location" value={form.location} onChange={handleChange} />
+          <input name="location" value={form.location} onChange={handleChange} placeholder="e.g. Remote / Bengaluru" />
         </label>
         <label>
-          Salary expectation
-          <input name="salaryExpectation" value={form.salaryExpectation} onChange={handleChange} placeholder="e.g. 6 LPA" />
+          Salary / CTC Expectation
+          <input name="salaryExpectation" value={form.salaryExpectation} onChange={handleChange} placeholder="e.g. 18 - 22 LPA" />
         </label>
         <label className="span-2">
-          Job link
-          <input type="url" name="jobLink" value={form.jobLink} onChange={handleChange} placeholder="https://" />
+          Job Posting Link
+          <input type="url" name="jobLink" value={form.jobLink} onChange={handleChange} placeholder="https://careers.company.com/job/..." />
         </label>
         <label>
-          Applied date *
+          Applied Date *
           <input type="date" name="appliedDate" value={form.appliedDate} onChange={handleChange} required />
         </label>
         <label>
-          Interview date
+          Interview Date (if scheduled)
           <input type="date" name="interviewDate" value={form.interviewDate} onChange={handleChange} />
         </label>
 
         {/* Status is only chosen when adding. After that it changes from the dropdown on the detail page. */}
         {!isEdit && (
           <label>
-            Status
+            Initial Status
             <select name="status" value={form.status} onChange={handleChange}>
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -142,12 +149,12 @@ function ApplicationForm() {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            gap: '8px',
+            gap: '10px',
             cursor: 'pointer',
-            background: '#f8fafc',
-            padding: '10px 14px',
-            borderRadius: '6px',
-            border: '1px solid #e2e8f0',
+            background: 'var(--lavender-light)',
+            padding: '12px 16px',
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--lavender-border)',
           }}
         >
           <input
@@ -155,22 +162,31 @@ function ApplicationForm() {
             name="isStarred"
             checked={form.isStarred}
             onChange={handleChange}
-            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+            style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--mocha-primary)' }}
           />
-          <span style={{ fontWeight: 600, color: '#334155' }}>
-            ⭐ Mark as Dream Company / Priority Bookmark
+          <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+            ⭐ Priority Bookmark: Mark as a Dream Company
           </span>
         </label>
 
         <label className="span-2">
-          Notes
-          <textarea name="notes" rows="4" value={form.notes} onChange={handleChange} />
+          Notes & Preparation Strategy
+          <textarea
+            name="notes"
+            rows="4"
+            value={form.notes}
+            onChange={handleChange}
+            placeholder="Key talking points, referral contact, recruiter name, or tech stack requirements..."
+          />
         </label>
 
-        <div className="span-2">
+        <div className="span-2" style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
           <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Application'}
           </button>
+          <Link to={isEdit ? `/applications/${id}` : '/'} className="btn">
+            Cancel
+          </Link>
         </div>
       </form>
     </div>

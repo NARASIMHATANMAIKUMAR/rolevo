@@ -41,14 +41,20 @@ function Login() {
 
   return (
     <div className="auth-panel panel">
+      <div style={{ marginBottom: '14px' }}>
+        <Link to="/tour" className="small muted" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          ← Explore Rolevo Feature Tour
+        </Link>
+      </div>
+
       <h1 className="page-title">Sign in to Rolevo</h1>
-      <p className="auth-subtitle">Track your job applications, interviews, and offers</p>
+      <p className="auth-subtitle">Welcome back! Sign in to continue tracking your applications.</p>
 
       <div className="demo-box">
         <div>
-          <strong>Demo Login:</strong> Narasimha
+          <strong>⚡ Quick Demo:</strong> Narasimha
         </div>
-        <button type="button" onClick={fillDemo}>
+        <button type="button" onClick={fillDemo} title="Click to prefill demo credentials">
           Auto-fill
         </button>
       </div>
@@ -58,20 +64,39 @@ function Login() {
       <form onSubmit={handleSubmit} className="form">
         <label>
           Email address
-          <input type="email" name="email" value={form.email} onChange={handleChange} required />
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="you@domain.com"
+            required
+          />
         </label>
         <label>
           Password
-          <input type="password" name="password" value={form.password} onChange={handleChange} required />
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="••••••••"
+            required
+          />
         </label>
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign in'}
+        <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: '6px' }}>
+          {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
 
-      <p className="small muted">
-        Don't have an account? <Link to="/register">Register here</Link>
-      </p>
+      <div style={{ textAlign: 'center', marginTop: '16px', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+        <p className="small muted" style={{ margin: '0 0 8px' }}>
+          Don't have an account yet?
+        </p>
+        <Link to="/register" className="btn btn-small" style={{ width: '100%' }}>
+          Register for Free
+        </Link>
+      </div>
     </div>
   );
 }

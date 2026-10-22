@@ -1,18 +1,20 @@
 /* layout.css - page structure: top bar, container, panels, forms, page headers */
 
 .topbar {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 12px rgba(62, 39, 24, 0.03);
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 40;
 }
 
 .topbar-inner {
-  max-width: 1200px;
+  max-width: 1220px;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 14px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,30 +23,32 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  font-size: 18px;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 20px;
   color: var(--text);
   text-decoration: none;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .brand-icon {
-  width: 26px;
-  height: 26px;
-  background: linear-gradient(135deg, #10b981, #047857);
-  color: #fff;
-  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--mocha-primary) 0%, var(--mocha-dark) 100%);
+  color: #ffffff;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
-  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3);
+  box-shadow: 0 3px 8px rgba(111, 78, 55, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(230, 224, 240, 0.5);
 }
 
 .brand-name {
   color: var(--text);
+  font-weight: 800;
 }
 
 .topbar-user {
@@ -56,84 +60,116 @@
 .user-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 13px;
-  font-weight: 500;
-  color: #334155;
-  background: #f1f5f9;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid #e2e8f0;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--lavender-light);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--lavender-border);
+}
+
+.user-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--mocha-primary), var(--lavender-deep));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1220px;
   margin: 0 auto;
-  padding: 24px 20px 48px;
+  padding: 28px 24px 56px;
 }
 
-/* White box with a thin border - used for most sections */
+/* White box with platinum border & refined shadow */
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 22px;
   box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 20px;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .page-title {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  color: var(--text);
+  letter-spacing: -0.025em;
 }
 
 .section-title {
-  font-size: 12px;
+  font-size: 12.5px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--muted);
-  margin-bottom: 12px;
-  font-weight: 600;
+  margin-bottom: 14px;
+  font-weight: 700;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* ---------- Forms ---------- */
+/* ---------- Forms & Auth ---------- */
 .auth-panel {
-  max-width: 400px;
+  max-width: 440px;
   margin: 50px auto;
-  padding: 28px;
+  padding: 36px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--platinum-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--mocha-primary), var(--lavender-deep));
 }
 
 .auth-panel .page-title {
   margin-bottom: 6px;
+  font-size: 22px;
 }
 
 .auth-subtitle {
   color: var(--muted);
-  font-size: 13px;
-  margin-bottom: 20px;
+  font-size: 13.5px;
+  margin-bottom: 22px;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
 .form label {
@@ -142,7 +178,7 @@
   gap: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: #334155;
+  color: var(--text);
 }
 
 .form label .muted {
@@ -150,14 +186,16 @@
 }
 
 .form-panel {
-  max-width: 780px;
+  max-width: 820px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 /* Two-column form on wider screens */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px 18px;
+  gap: 16px 20px;
 }
 
 .span-2 {
@@ -166,35 +204,44 @@
 
 /* Demo box on login */
 .demo-box {
-  background: #f0fdf4;
-  border: 1px dashed #86efac;
+  background: var(--mocha-light);
+  border: 1px solid rgba(111, 78, 55, 0.25);
   border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  margin-bottom: 16px;
-  font-size: 12px;
-  color: #166534;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+  color: var(--mocha-dark);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .demo-box button {
-  background: #16a34a;
-  color: #fff;
+  background: var(--mocha-primary);
+  color: #ffffff;
   border: none;
-  border-radius: 4px;
-  padding: 3px 8px;
-  font-size: 11px;
+  border-radius: 6px;
+  padding: 5px 11px;
+  font-size: 12px;
   cursor: pointer;
   font-weight: 600;
+  transition: background 0.15s ease;
 }
 
 .demo-box button:hover {
-  background: #15803d;
+  background: var(--mocha-dark);
 }
 
 /* ---------- Mobile ---------- */
-@media (max-width: 640px) {
+@media (max-width: 680px) {
+  .topbar-inner {
+    padding: 12px 16px;
+  }
+
+  .container {
+    padding: 18px 14px 40px;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -205,5 +252,11 @@
 
   .page-header {
     flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actions {
+    width: 100%;
+    flex-wrap: wrap;
   }
 }

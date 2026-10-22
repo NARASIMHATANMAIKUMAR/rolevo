@@ -40,29 +40,64 @@ function Register() {
 
   return (
     <div className="auth-panel panel">
+      <div style={{ marginBottom: '14px' }}>
+        <Link to="/tour" className="small muted" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          ← Explore Rolevo Feature Tour
+        </Link>
+      </div>
+
       <h1 className="page-title">Create your Rolevo account</h1>
-      <p className="auth-subtitle">Join Rolevo to organize and track your career growth</p>
+      <p className="auth-subtitle">Join Rolevo to organize and track your career growth with total clarity.</p>
+
       {error && <div className="alert">{error}</div>}
+
       <form onSubmit={handleSubmit} className="form">
         <label>
-          Name
-          <input type="text" name="name" value={form.name} onChange={handleChange} required />
+          Full Name
+          <input
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="e.g. Alex Morgan"
+            required
+          />
         </label>
         <label>
-          Email
-          <input type="email" name="email" value={form.email} onChange={handleChange} required />
+          Email Address
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="you@domain.com"
+            required
+          />
         </label>
         <label>
           Password <span className="muted">(min 6 characters)</span>
-          <input type="password" name="password" value={form.password} onChange={handleChange} required />
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="Create a secure password"
+            required
+          />
         </label>
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Creating...' : 'Register'}
+        <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: '6px' }}>
+          {loading ? 'Creating Account...' : 'Register for Free 🚀'}
         </button>
       </form>
-      <p className="small">
-        Already registered? <Link to="/login">Log in</Link>
-      </p>
+
+      <div style={{ textAlign: 'center', marginTop: '16px', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+        <p className="small muted" style={{ margin: '0 0 8px' }}>
+          Already have an account?
+        </p>
+        <Link to="/login" className="btn btn-small" style={{ width: '100%' }}>
+          Sign In
+        </Link>
+      </div>
     </div>
   );
 }

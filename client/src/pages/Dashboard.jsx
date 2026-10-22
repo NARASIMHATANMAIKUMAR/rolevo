@@ -15,6 +15,7 @@ function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
 
   const [stats, setStats] = useState(null);
   const [statsError, setStatsError] = useState('');
@@ -27,6 +28,11 @@ function Dashboard() {
 
   const [view, setView] = useState(getSavedView);
   const [updatingId, setUpdatingId] = useState(null); // id of the row whose status is being saved
+
+  function showToast(msg) {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 3000);
+  }
 
   // Load stats cards
   async function loadStats() {
@@ -82,6 +88,7 @@ function Dashboard() {
       const res = await api.patch(`/applications/${id}/status`, { status });
       setApplications((prev) => prev.map((app) => (app._id === id ? res.data : app)));
       loadStats();
+      showToast(`Status updated to "${status}"`);
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -96,6 +103,7 @@ function Dashboard() {
       setApplications((prev) =>
         prev.map((app) => (app._id === id ? { ...app, isStarred: res.data.isStarred } : app))
       );
+      showToast(res.data.isStarred ? 'Marked as Dream Company ⭐' : 'Unstarred company');
     } catch (err) {
       setError(getErrorMessage(err));
     }
@@ -104,7 +112,7 @@ function Dashboard() {
   // Export current applications list as a CSV file
   function handleExportCSV() {
     if (applications.length === 0) {
-      alert('No applications to export.');
+      setError('No applications available to export.');
       return;
     }
 
@@ -146,6 +154,7 @@ function Dashboard() {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     document.body.removeChild(downloadAnchor);
+    showToast('Spreadsheet exported successfully 📥');
   }
 
   const hasFilters = search !== '' || statusFilter !== '' || starredOnly;
@@ -176,16 +185,44 @@ function Dashboard() {
         </div>
       </div>
 
+      {toastMessage && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            background: 'var(--mocha-dark)',
+            color: '#ffffff',
+            padding: '12px 20px',
+            borderRadius: 'var(--radius)',
+            boxShadow: 'var(--shadow-lg)',
+            zIndex: 100,
+            fontSize: '13.5px',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            animation: 'fadeIn 0.2s ease',
+          }}
+        >
+          {toastMessage}
+        </div>
+      )}
+
       {statsError && <div className="alert">{statsError}</div>}
       {stats ? <StatsCards stats={stats} /> : !statsError && <p className="muted">Loading stats...</p>}
 
       <div className="toolbar panel">
-        <input
-          type="search"
-          placeholder="Search by company or role..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="search-input-wrap">
+          <span className="search-icon">🔍</span>
+          <input
+            type="search"
+            placeholder="Search by company or role..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="">All statuses</option>
           {STATUSES.map((s) => (
@@ -194,6 +231,7 @@ function Dashboard() {
             </option>
           ))}
         </select>
+
         <select value={sort} onChange={(e) => setSort(e.target.value)}>
           <option value="newest">Applied: newest first</option>
           <option value="oldest">Applied: oldest first</option>
@@ -222,12 +260,37 @@ function Dashboard() {
       {error && <div className="alert">{error}</div>}
 
       {loading ? (
-        <p className="muted">Loading applications...</p>
+        <p className="muted" style={{ padding: '24px', textAlign: 'center' }}>
+          Loading applications...
+        </p>
       ) : applications.length === 0 ? (
         <div className="panel empty">
-          {hasFilters
-            ? 'No applications match your active search or filters.'
-            : 'No applications yet. Click "+ New Application" to add your first job!'}
+          <div style={{ fontSize: '32px', marginBottom: '8px' }}>📂</div>
+          <div style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
+            {hasFilters ? 'No matching applications found' : 'No applications tracked yet'}
+          </div>
+          <p className="muted small" style={{ margin: '0 0 16px' }}>
+            {hasFilters
+              ? 'Try adjusting your search terms or clearing status filters.'
+              : 'Add your first job application to get your pipeline started.'}
+          </p>
+          {hasFilters ? (
+            <button
+              type="button"
+              className="btn btn-small"
+              onClick={() => {
+                setSearch('');
+                setStatusFilter('');
+                setStarredOnly(false);
+              }}
+            >
+              Clear Filters
+            </button>
+          ) : (
+            <Link to="/applications/new" className="btn btn-primary btn-small">
+              + Add Application
+            </Link>
+          )}
         </div>
       ) : view === 'list' ? (
         <ListView

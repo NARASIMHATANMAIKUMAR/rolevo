@@ -1,28 +1,62 @@
-/* base.css - Rolevo Design System (Emerald Theme) */
+/* base.css - Rolevo Design System (Option 1: Mocha Brown, Platinum Silver, Pale Lavender) */
 
 :root {
-  --bg: #f8fafc;
-  --panel: #ffffff;
-  --border: #e2e8f0;
-  --text: #0f172a;
-  --muted: #64748b;
-  --accent: #059669; /* Emerald 600 */
-  --accent-dark: #047857; /* Emerald 700 */
-  --accent-light: #ecfdf5; /* Emerald 50 */
-  --accent-glow: rgba(5, 150, 105, 0.18);
+  /* Option 1 Core Palette */
+  --mocha-primary: #6F4E37;       /* Rich Mocha Brown */
+  --mocha-dark: #3E2718;          /* Espresso Dark */
+  --mocha-hover: #563C2A;         /* Dark Mocha Hover */
+  --mocha-light: #F7F3EF;         /* Soft Latte Wash */
+  --mocha-glow: rgba(111, 78, 55, 0.2);
 
-  --applied: #64748b;
-  --interview: #d97706; /* Amber */
-  --offer: #059669; /* Emerald */
-  --rejected: #dc2626; /* Rose / Red */
-  --star: #f59e0b; /* Gold */
+  --platinum: #E5E4E2;            /* Platinum Silver */
+  --platinum-border: #D8D6D3;     /* Refined Platinum Border */
+  --platinum-canvas: #F6F4F1;     /* Warm Grounded Canvas */
+  --platinum-card: #FFFFFF;       /* Clean Card Surface */
+  --platinum-elevated: #FAF9F8;   /* Elevated Surface */
 
-  --radius: 8px;
-  --radius-sm: 5px;
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --lavender: #E6E0F0;            /* Pale Lavender */
+  --lavender-light: #F6F3FA;      /* Subtle Lavender Wash */
+  --lavender-deep: #7C5295;       /* Royal Lavender Accent */
+  --lavender-glow: rgba(124, 82, 149, 0.18);
+  --lavender-border: #D8CCE6;     /* Border for lavender elements */
+
+  /* Text & Neutral Hierarchy */
+  --text: #1C1917;                /* Warm Obsidian / Deep Charcoal */
+  --text-secondary: #57524E;      /* Refined Neutral Muted */
+  --muted: #78716C;               /* Subtle Caption Muted */
+  --border: var(--platinum-border);
+  --bg: var(--platinum-canvas);
+  --panel: var(--platinum-card);
+  --accent: var(--mocha-primary);
+  --accent-dark: var(--mocha-dark);
+  --accent-light: var(--mocha-light);
+  --accent-glow: var(--mocha-glow);
+
+  /* Status Colors (Harmonized with earthy luxury tones) */
+  --applied: #5A6A80;             /* Platinum Slate */
+  --applied-bg: #EEF2F6;
+  --interview: #C27803;           /* Warm Ochre Amber */
+  --interview-bg: #FEF3C7;
+  --offer: #15803D;               /* Forest Emerald */
+  --offer-bg: #DCFCE7;
+  --rejected: #BE185D;            /* Deep Berry Rose */
+  --rejected-bg: #FCE7F3;
+  --star: #EAB308;                /* Radiant Gold */
+
+  /* Geometry & Shadows */
+  --radius: 12px;
+  --radius-sm: 7px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --mono: 'JetBrains Mono', Consolas, 'Liberation Mono', Menlo, monospace;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+
+  --shadow-xs: 0 1px 2px rgba(62, 39, 24, 0.04);
+  --shadow-sm: 0 2px 6px -1px rgba(62, 39, 24, 0.06), 0 1px 3px rgba(62, 39, 24, 0.04);
+  --shadow-md: 0 6px 18px -3px rgba(62, 39, 24, 0.08), 0 2px 8px -2px rgba(62, 39, 24, 0.05);
+  --shadow-lg: 0 16px 36px -6px rgba(62, 39, 24, 0.12), 0 6px 14px -3px rgba(62, 39, 24, 0.06);
+  --shadow-glow: 0 0 20px var(--mocha-glow);
 }
 
 * {
@@ -32,30 +66,34 @@
 body {
   margin: 0;
   background: var(--bg);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(230, 224, 240, 0.45) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(111, 78, 55, 0.06) 0px, transparent 40%),
+    radial-gradient(at 50% 100%, rgba(230, 224, 240, 0.3) 0px, transparent 50%);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font);
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: var(--accent);
+  color: var(--mocha-primary);
   text-decoration: none;
-  transition: color 0.15s ease;
+  font-weight: 500;
+  transition: color 0.18s ease;
 }
 
 a:hover {
-  color: var(--accent-dark);
+  color: var(--mocha-dark);
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3, h4 {
   margin: 0;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.022em;
 }
 
 .muted {
@@ -76,19 +114,24 @@ select,
 textarea {
   font: inherit;
   color: var(--text);
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  padding: 9px 12px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  border-color: var(--mocha-primary);
+  box-shadow: 0 0 0 3px var(--mocha-glow), 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #A8A29E;
 }
 
 textarea {
@@ -100,61 +143,87 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   font: inherit;
-  font-weight: 500;
-  padding: 7px 14px;
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 8px 16px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: #fff;
+  background: #ffffff;
   color: var(--text);
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-xs);
 }
 
 .btn:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: var(--platinum-elevated);
+  border-color: var(--platinum-dark);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
 }
 
 .btn:active {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: linear-gradient(135deg, var(--mocha-primary) 0%, var(--mocha-dark) 100%);
+  border-color: var(--mocha-dark);
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(111, 78, 55, 0.25);
 }
 
 .btn-primary:hover {
-  background: var(--accent-dark);
-  border-color: var(--accent-dark);
-  color: #fff;
+  background: linear-gradient(135deg, #7C5840 0%, #352013 100%);
+  border-color: #2E1B10;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(111, 78, 55, 0.32);
+}
+
+.btn-lavender {
+  background: linear-gradient(135deg, var(--lavender) 0%, #DFD5EB 100%);
+  border: 1px solid var(--lavender-border);
+  color: var(--lavender-deep);
+  font-weight: 600;
+}
+
+.btn-lavender:hover {
+  background: #D8CCE6;
+  color: #5C3773;
 }
 
 .btn-danger {
   color: var(--rejected);
-  border-color: #fecaca;
-  background: #fff;
+  border-color: #FECDD3;
+  background: #FFF1F2;
 }
 
 .btn-danger:hover {
-  background: #fef2f2;
+  background: #FFE4E6;
   border-color: var(--rejected);
+  color: #9F1239;
 }
 
 .btn-small {
-  padding: 4px 10px;
-  font-size: 13px;
+  padding: 5px 11px;
+  font-size: 12.5px;
+  border-radius: 6px;
+}
+
+.btn-large {
+  padding: 12px 24px;
+  font-size: 15px;
+  border-radius: var(--radius);
 }
 
 .btn-icon {
@@ -162,45 +231,52 @@ textarea {
   border: none;
   box-shadow: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  color: #94a3b8;
-  border-radius: 4px;
-  transition: transform 0.15s ease, color 0.15s ease;
+  color: #A8A29E;
+  border-radius: 6px;
+  transition: transform 0.2s ease, color 0.2s ease, background 0.15s ease;
 }
 
 .btn-icon:hover {
   transform: scale(1.15);
   color: var(--star);
+  background: rgba(234, 179, 8, 0.12);
 }
 
 .btn-icon.starred {
   color: var(--star);
 }
 
-/* Red error box shown above forms and lists */
+/* Alert Message */
 .alert {
-  padding: 10px 14px;
-  margin-bottom: 14px;
-  border: 1px solid #fecaca;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border: 1px solid #FECDD3;
   border-radius: var(--radius-sm);
-  background: #fef2f2;
+  background: #FFF1F2;
   color: var(--rejected);
-  font-size: 13px;
+  font-size: 13.5px;
+  font-weight: 500;
 }
 
+/* Starred Dream Company Pill */
 .badge-starred {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  background: #fef3c7;
-  color: #b45309;
-  font-size: 11px;
+  gap: 5px;
+  background: linear-gradient(135deg, #FEF3C7 0%, #EDE7F6 100%);
+  color: #854D0E;
+  font-size: 11.5px;
   font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 999px;
-  border: 1px solid #fde68a;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid #FDE68A;
+  box-shadow: 0 1px 3px rgba(234, 179, 8, 0.15);
 }

@@ -13,10 +13,14 @@ function BoardView({ applications, onStatusChange, onToggleStar, updatingId }) {
           <section className={`board-col board-col-${status.toLowerCase()}`} key={status}>
             <div className="board-col-title">
               <span>{status}</span>
-              <span className="muted">({items.length})</span>
+              <span className="board-count-pill">{items.length}</span>
             </div>
 
-            {items.length === 0 && <p className="muted small">No applications</p>}
+            {items.length === 0 && (
+              <p className="muted small" style={{ textAlign: 'center', padding: '24px 0' }}>
+                No applications
+              </p>
+            )}
 
             {items.map((app) => (
               <div className="card" key={app._id}>
@@ -36,14 +40,24 @@ function BoardView({ applications, onStatusChange, onToggleStar, updatingId }) {
 
                 <div className="card-role">{app.role}</div>
 
-                {app.salaryExpectation && (
-                  <div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+                  {app.location && (
+                    <span className="small muted" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                      📍 {app.location}
+                    </span>
+                  )}
+                  {app.salaryExpectation && (
                     <span className="salary-tag">{app.salaryExpectation}</span>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 <div className="card-meta">
                   <span>Applied {formatDate(app.appliedDate)}</span>
+                  {app.interviewDate && (
+                    <span style={{ color: 'var(--interview)', fontWeight: 600 }}>
+                      • Int: {formatDate(app.interviewDate)}
+                    </span>
+                  )}
                   <FollowUpLabel application={app} />
                 </div>
 
