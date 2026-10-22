@@ -1,5 +1,6 @@
-// Entry point of the backend: sets up Express, middleware, routes and the DB connection
-require('dotenv').config(); // loads MONGO_URI, JWT_SECRET, PORT from .env into process.env
+const path = require('path');
+require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
@@ -25,14 +26,19 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Simple health check route
+// Health check routes
 app.get('/', (req, res) => {
   res.json({ message: 'Rolevo API is running' });
 });
+app.get('/api', (req, res) => {
+  res.json({ message: 'Rolevo API is running' });
+});
 
-// Mount route groups
+// Mount route groups (support both /api/path and /path in serverless rewrites)
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/applications', applicationRoutes);
 
 // Any route not matched above
 app.use((req, res) => {
