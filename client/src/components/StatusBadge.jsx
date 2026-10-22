@@ -1,6 +1,12 @@
-// Small colored label for a status. The color comes from the CSS class, e.g. .badge-offer
-function StatusBadge({ status }) {
-  return <span className={`badge badge-${status.toLowerCase()}`}>{status}</span>;
+// Accessible status badge with subtle indicator dot
+function StatusBadge({ status = 'Applied' }) {
+  const safeStatus = status || 'Applied';
+  return (
+    <span className={`badge badge-${safeStatus.toLowerCase()}`}>
+      <span className="badge-dot" aria-hidden="true" />
+      <span>{safeStatus}</span>
+    </span>
+  );
 }
 
 export default StatusBadge;

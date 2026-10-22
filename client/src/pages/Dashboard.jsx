@@ -4,6 +4,16 @@ import api, { getErrorMessage } from '../api/axios';
 import StatsCards from '../components/StatsCards';
 import ListView from '../components/ListView';
 import BoardView from '../components/BoardView';
+import {
+  IconSearch,
+  IconDownload,
+  IconPlus,
+  IconStar,
+  IconList,
+  IconKanban,
+  IconBriefcase,
+  IconFilter
+} from '../components/Icons';
 import { STATUSES } from '../utils/helpers';
 
 // Remember which view (list/board) the user picked last time
@@ -20,14 +30,14 @@ function Dashboard() {
   const [stats, setStats] = useState(null);
   const [statsError, setStatsError] = useState('');
 
-  // Filters - sent to the backend as query params
+  // Filters: sent to backend as query parameters
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [sort, setSort] = useState('newest');
   const [starredOnly, setStarredOnly] = useState(false);
 
   const [view, setView] = useState(getSavedView);
-  const [updatingId, setUpdatingId] = useState(null); // id of the row whose status is being saved
+  const [updatingId, setUpdatingId] = useState(null);
 
   function showToast(msg) {
     setToastMessage(msg);
@@ -45,12 +55,12 @@ function Dashboard() {
     }
   }
 
-  // Load stats once when the page opens
+  // Load stats once on mount
   useEffect(() => {
     loadStats();
   }, []);
 
-  // Load applications whenever a filter changes.
+  // Load applications whenever a filter changes
   useEffect(() => {
     const timer = setTimeout(async () => {
       setLoading(true);
@@ -80,7 +90,7 @@ function Dashboard() {
     localStorage.setItem('view', newView);
   }
 
-  // Called by the status dropdown in ListView / BoardView
+  // Called by status selector in ListView / BoardView
   async function handleStatusChange(id, status) {
     setUpdatingId(id);
     setError('');
@@ -96,20 +106,20 @@ function Dashboard() {
     }
   }
 
-  // Toggle Star / Dream company bookmark
+  // Toggle Star / Priority bookmark
   async function handleToggleStar(id) {
     try {
       const res = await api.patch(`/applications/${id}/star`);
       setApplications((prev) =>
         prev.map((app) => (app._id === id ? { ...app, isStarred: res.data.isStarred } : app))
       );
-      showToast(res.data.isStarred ? 'Marked as Dream Company ⭐' : 'Unstarred company');
+      showToast(res.data.isStarred ? 'Marked as priority target' : 'Removed from priority targets');
     } catch (err) {
       setError(getErrorMessage(err));
     }
   }
 
-  // Export current applications list as a CSV file
+  // Export current applications list as an RFC 4180 CSV file
   function handleExportCSV() {
     if (applications.length === 0) {
       setError('No applications available to export.');
@@ -124,7 +134,7 @@ function Dashboard() {
       'Interview Date',
       'Location',
       'Salary Expectation',
-      'Dream Company (Starred)',
+      'Priority Bookmark',
       'Notes',
       'Job Link',
     ];
@@ -154,141 +164,159 @@ function Dashboard() {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     document.body.removeChild(downloadAnchor);
-    showToast('Spreadsheet exported successfully 📥');
+    showToast('Spreadsheet report exported successfully');
   }
 
   const hasFilters = search !== '' || statusFilter !== '' || starredOnly;
 
   return (
-    <div>
+    <div className="dashboard-wrap">
       <div className="page-header">
         <div>
           <h1 className="page-title">
             <span>Job Applications</span>
           </h1>
-          <p className="muted small" style={{ margin: '4px 0 0' }}>
-            Track and progress your job hunt in one organized space
+          <p className="page-subtitle">
+            Manage your application pipeline, interview milestones, and offer status
           </p>
         </div>
         <div className="actions">
           <button
             type="button"
-            className="btn btn-export"
+            className="btn btn-secondary"
             onClick={handleExportCSV}
             title="Download CSV spreadsheet report"
           >
-            <span>📥</span> Export CSV
+            <IconDownload size={15} /> Export CSV
           </button>
           <Link to="/applications/new" className="btn btn-primary">
-            <span>+</span> New Application
+            <IconPlus size={15} /> New Application
           </Link>
         </div>
       </div>
 
       {toastMessage && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            background: 'var(--mocha-dark)',
-            color: '#ffffff',
-            padding: '12px 20px',
-            borderRadius: 'var(--radius)',
-            boxShadow: 'var(--shadow-lg)',
-            zIndex: 100,
-            fontSize: '13.5px',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            animation: 'fadeIn 0.2s ease',
-          }}
-        >
-          {toastMessage}
+        <div className="toast-notification" role="status" aria-live="polite">
+          <span>{toastMessage}</span>
         </div>
       )}
 
       {statsError && <div className="alert">{statsError}</div>}
-      {stats ? <StatsCards stats={stats} /> : !statsError && <p className="muted">Loading stats...</p>}
+      {stats ? (
+        <StatsCards stats={stats} />
+      ) : !statsError ? (
+        <div className="stats-loading-skeleton" aria-hidden="true" />
+      ) : null}
 
       <div className="toolbar panel">
         <div className="search-input-wrap">
-          <span className="search-icon">🔍</span>
+          <IconSearch size={15} className="search-icon" />
           <input
             type="search"
-            placeholder="Search by company or role..."
+            aria-label="Search by company or role"
+            placeholder="Search company or role..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-          <option value="">All statuses</option>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        <div className="toolbar-controls">
+          <div className="select-wrap">
+            <select
+              aria-label="Filter by application status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">All statuses</option>
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <select value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="newest">Applied: newest first</option>
-          <option value="oldest">Applied: oldest first</option>
-        </select>
+          <div className="select-wrap">
+            <select
+              aria-label="Sort applications"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="newest">Applied: newest first</option>
+              <option value="oldest">Applied: oldest first</option>
+            </select>
+          </div>
 
-        <button
-          type="button"
-          className={`btn-filter-star ${starredOnly ? 'active' : ''}`}
-          onClick={() => setStarredOnly(!starredOnly)}
-          title="Toggle starred / dream companies"
-        >
-          <span>{starredOnly ? '⭐' : '☆'}</span>
-          <span>{starredOnly ? 'Starred Only' : 'Favorites'}</span>
-        </button>
-
-        <div className="view-toggle">
-          <button className={view === 'list' ? 'active' : ''} onClick={() => changeView('list')}>
-            List View
+          <button
+            type="button"
+            className={`btn-filter-star ${starredOnly ? 'active' : ''}`}
+            onClick={() => setStarredOnly(!starredOnly)}
+            title="Filter by priority targets"
+            aria-pressed={starredOnly}
+          >
+            <IconStar filled={starredOnly} size={14} />
+            <span>{starredOnly ? 'Priority Only' : 'Priority Targets'}</span>
           </button>
-          <button className={view === 'board' ? 'active' : ''} onClick={() => changeView('board')}>
-            Board View
-          </button>
+
+          <div className="view-toggle" role="group" aria-label="Layout view">
+            <button
+              type="button"
+              className={view === 'list' ? 'active' : ''}
+              onClick={() => changeView('list')}
+              title="Table row layout"
+              aria-pressed={view === 'list'}
+            >
+              <IconList size={14} />
+              <span>List</span>
+            </button>
+            <button
+              type="button"
+              className={view === 'board' ? 'active' : ''}
+              onClick={() => changeView('board')}
+              title="Kanban column layout"
+              aria-pressed={view === 'board'}
+            >
+              <IconKanban size={14} />
+              <span>Board</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {error && <div className="alert">{error}</div>}
 
       {loading ? (
-        <p className="muted" style={{ padding: '24px', textAlign: 'center' }}>
-          Loading applications...
-        </p>
+        <div className="panel loading-state">
+          <p className="muted">Updating application records...</p>
+        </div>
       ) : applications.length === 0 ? (
-        <div className="panel empty">
-          <div style={{ fontSize: '32px', marginBottom: '8px' }}>📂</div>
-          <div style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
-            {hasFilters ? 'No matching applications found' : 'No applications tracked yet'}
+        <div className="panel empty-state" role="region" aria-label="Empty applications state">
+          <div className="empty-state-icon" aria-hidden="true">
+            <IconBriefcase size={36} />
           </div>
-          <p className="muted small" style={{ margin: '0 0 16px' }}>
+          <h2 className="empty-state-title">
+            {hasFilters ? 'No matching applications found' : 'No applications logged yet'}
+          </h2>
+          <p className="empty-state-text">
             {hasFilters
-              ? 'Try adjusting your search terms or clearing status filters.'
-              : 'Add your first job application to get your pipeline started.'}
+              ? 'Try modifying your search criteria or reset filters to display all records.'
+              : 'Add your first job application to initiate your pipeline tracking.'}
           </p>
           {hasFilters ? (
             <button
               type="button"
-              className="btn btn-small"
+              className="btn btn-secondary btn-small"
               onClick={() => {
                 setSearch('');
                 setStatusFilter('');
                 setStarredOnly(false);
               }}
             >
-              Clear Filters
+              Reset Filters
             </button>
           ) : (
             <Link to="/applications/new" className="btn btn-primary btn-small">
-              + Add Application
+              <IconPlus size={14} /> Add First Application
             </Link>
           )}
         </div>

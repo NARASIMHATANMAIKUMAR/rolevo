@@ -15,28 +15,39 @@ function Navbar() {
   return (
     <header className="topbar">
       <div className="topbar-inner">
-        <Link to="/" className="brand">
-          <span className="brand-icon">R</span>
+        <Link to="/" className="brand" aria-label="Rolevo home">
+          <span className="brand-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 21V3h8a5 5 0 0 1 5 5 5 5 0 0 1-5 5H4" />
+              <line x1="12" y1="13" x2="20" y2="21" />
+            </svg>
+          </span>
           <span className="brand-name">Rolevo</span>
+          <span className="brand-badge">Tracker</span>
         </Link>
 
         {user ? (
           <div className="topbar-user">
-            <span className="user-badge">
-              <span className="user-avatar">{initial}</span>
-              <span>{user.name}</span>
+            <span className="user-badge" title={`Signed in as ${user.email}`}>
+              <span className="user-avatar" aria-hidden="true">{initial}</span>
+              <span className="user-name">{user.name}</span>
             </span>
-            <button className="btn btn-small" onClick={handleLogout} title="Sign out of Rolevo">
-              Logout
+            <button
+              type="button"
+              className="btn btn-secondary btn-small"
+              onClick={handleLogout}
+              title="Sign out of your session"
+            >
+              Sign Out
             </button>
           </div>
         ) : (
           <div className="topbar-user">
-            <Link to="/login" className="btn btn-small" style={{ border: 'none', background: 'transparent' }}>
+            <Link to="/login" className="btn btn-secondary btn-small">
               Sign In
             </Link>
             <Link to="/register" className="btn btn-primary btn-small">
-              Register for Free
+              Create Account
             </Link>
           </div>
         )}

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import api, { getErrorMessage } from '../api/axios';
+import { IconArrowLeft, IconStar } from '../components/Icons';
 import { STATUSES, toInputDate, todayInputDate } from '../utils/helpers';
 
-// Same page is used for Add (/applications/new) and Edit (/applications/:id/edit)
+// Shared form component for Add (/applications/new) and Edit (/applications/:id/edit)
 function ApplicationForm() {
   const { id } = useParams();
-  const isEdit = Boolean(id); // there is an id in the URL -> we are editing
+  const isEdit = Boolean(id);
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -21,11 +22,11 @@ function ApplicationForm() {
     notes: '',
     isStarred: false,
   });
-  const [loading, setLoading] = useState(isEdit); // only need to load data when editing
+  const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  // In edit mode, load the existing application and fill the form
+  // When editing, fetch existing application record
   useEffect(() => {
     if (!isEdit) return;
     async function load() {
@@ -63,132 +64,181 @@ function ApplicationForm() {
     setError('');
 
     if (!form.company.trim() || !form.role.trim() || !form.appliedDate) {
-      setError('Company, role and applied date are required');
+      setError('Company name, role, and applied date are required fields.');
       return;
     }
 
     const payload = { ...form, interviewDate: form.interviewDate || null };
-    if (isEdit) delete payload.status; // status is changed with PATCH, not with edit
+    if (isEdit) delete payload.status; // status is modified via status transitions
 
     setSaving(true);
     try {
       const res = isEdit
         ? await api.put(`/applications/${id}`, payload)
         : await api.post('/applications', payload);
-      navigate(`/applications/${res.data._id}`); // go to the detail page
+      navigate(`/applications/${res.data._id}`);
     } catch (err) {
       setError(getErrorMessage(err));
       setSaving(false);
     }
   }
 
-  if (loading) return <p className="muted" style={{ padding: '32px', textAlign: 'center' }}>Loading application...</p>;
+  if (loading) {
+    return (
+      <div className="panel loading-state">
+        <p className="muted">Loading application details...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="panel form-panel" style={{ margin: '0 auto' }}>
-      <div className="page-header" style={{ marginBottom: '20px' }}>
-        <div>
-          <h1 className="page-title">{isEdit ? 'Edit Application' : 'Add New Application'}</h1>
-          <p className="muted small" style={{ margin: '2px 0 0' }}>
-            {isEdit ? 'Update details and salary expectations' : 'Track an active job application'}
-          </p>
-        </div>
-        <Link to={isEdit ? `/applications/${id}` : '/'} className="btn btn-small">
-          Cancel
+    <div className="form-page-wrap">
+      <div className="form-breadcrumb">
+        <Link to={isEdit ? `/applications/${id}` : '/'} className="breadcrumb-link">
+          <IconArrowLeft size={14} /> Back to {isEdit ? 'Details' : 'Applications'}
         </Link>
       </div>
 
-      {error && <div className="alert">{error}</div>}
-
-      <form onSubmit={handleSubmit} className="form form-grid">
-        <label>
-          Company Name *
-          <input name="company" value={form.company} onChange={handleChange} placeholder="e.g. Google" required />
-        </label>
-        <label>
-          Role / Job Title *
-          <input name="role" value={form.role} onChange={handleChange} placeholder="e.g. Senior Frontend Engineer" required />
-        </label>
-        <label>
-          Location
-          <input name="location" value={form.location} onChange={handleChange} placeholder="e.g. Remote / Bengaluru" />
-        </label>
-        <label>
-          Salary / CTC Expectation
-          <input name="salaryExpectation" value={form.salaryExpectation} onChange={handleChange} placeholder="e.g. 18 - 22 LPA" />
-        </label>
-        <label className="span-2">
-          Job Posting Link
-          <input type="url" name="jobLink" value={form.jobLink} onChange={handleChange} placeholder="https://careers.company.com/job/..." />
-        </label>
-        <label>
-          Applied Date *
-          <input type="date" name="appliedDate" value={form.appliedDate} onChange={handleChange} required />
-        </label>
-        <label>
-          Interview Date (if scheduled)
-          <input type="date" name="interviewDate" value={form.interviewDate} onChange={handleChange} />
-        </label>
-
-        {/* Status is only chosen when adding. After that it changes from the dropdown on the detail page. */}
-        {!isEdit && (
-          <label>
-            Initial Status
-            <select name="status" value={form.status} onChange={handleChange}>
-              {STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-
-        <label
-          className="span-2"
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: '10px',
-            cursor: 'pointer',
-            background: 'var(--lavender-light)',
-            padding: '12px 16px',
-            borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--lavender-border)',
-          }}
-        >
-          <input
-            type="checkbox"
-            name="isStarred"
-            checked={form.isStarred}
-            onChange={handleChange}
-            style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--mocha-primary)' }}
-          />
-          <span style={{ fontWeight: 600, color: 'var(--text)' }}>
-            ⭐ Priority Bookmark: Mark as a Dream Company
-          </span>
-        </label>
-
-        <label className="span-2">
-          Notes & Preparation Strategy
-          <textarea
-            name="notes"
-            rows="4"
-            value={form.notes}
-            onChange={handleChange}
-            placeholder="Key talking points, referral contact, recruiter name, or tech stack requirements..."
-          />
-        </label>
-
-        <div className="span-2" style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-          <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Application'}
-          </button>
-          <Link to={isEdit ? `/applications/${id}` : '/'} className="btn">
+      <div className="panel form-panel">
+        <div className="page-header form-header">
+          <div>
+            <h1 className="page-title">{isEdit ? 'Edit Application' : 'Add New Application'}</h1>
+            <p className="page-subtitle">
+              {isEdit ? 'Update role details, dates, and salary expectations' : 'Record an active job application in your pipeline'}
+            </p>
+          </div>
+          <Link to={isEdit ? `/applications/${id}` : '/'} className="btn btn-secondary btn-small">
             Cancel
           </Link>
         </div>
-      </form>
+
+        {error && <div className="alert">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="form form-grid">
+          <label>
+            <span>Company Name *</span>
+            <input
+              name="company"
+              value={form.company}
+              onChange={handleChange}
+              placeholder="e.g. Google, Microsoft, Zoho"
+              required
+            />
+          </label>
+
+          <label>
+            <span>Role / Position *</span>
+            <input
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              placeholder="e.g. Software Development Engineer"
+              required
+            />
+          </label>
+
+          <label>
+            <span>Location</span>
+            <input
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              placeholder="e.g. Bengaluru / Remote / Hybrid"
+            />
+          </label>
+
+          <label>
+            <span>Salary / CTC Expectation</span>
+            <input
+              name="salaryExpectation"
+              value={form.salaryExpectation}
+              onChange={handleChange}
+              placeholder="e.g. 18 to 22 LPA"
+            />
+          </label>
+
+          <label className="span-2">
+            <span>Job Posting URL</span>
+            <input
+              type="url"
+              name="jobLink"
+              value={form.jobLink}
+              onChange={handleChange}
+              placeholder="https://careers.company.com/job/..."
+            />
+          </label>
+
+          <label>
+            <span>Applied Date *</span>
+            <input
+              type="date"
+              name="appliedDate"
+              value={form.appliedDate}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          <label>
+            <span>Interview Date (if scheduled)</span>
+            <input
+              type="date"
+              name="interviewDate"
+              value={form.interviewDate}
+              onChange={handleChange}
+            />
+          </label>
+
+          {!isEdit && (
+            <label className="span-2">
+              <span>Initial Pipeline Status</span>
+              <select name="status" value={form.status} onChange={handleChange}>
+                {STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+
+          <div className="span-2 checkbox-card">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                name="isStarred"
+                checked={form.isStarred}
+                onChange={handleChange}
+                className="checkbox-input"
+              />
+              <span className="checkbox-text">
+                <IconStar filled={form.isStarred} size={15} />
+                <span>Bookmark as Priority Target Company</span>
+              </span>
+            </label>
+          </div>
+
+          <label className="span-2">
+            <span>Preparation Notes and Strategy</span>
+            <textarea
+              name="notes"
+              rows="4"
+              value={form.notes}
+              onChange={handleChange}
+              placeholder="Key talking points, recruiter contacts, tech stack requirements, or interview prep focus..."
+            />
+          </label>
+
+          <div className="span-2 form-actions">
+            <button type="submit" className="btn btn-primary" disabled={saving}>
+              {saving ? 'Saving...' : isEdit ? 'Save Application Changes' : 'Create Application'}
+            </button>
+            <Link to={isEdit ? `/applications/${id}` : '/'} className="btn btn-secondary">
+              Cancel
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -4,6 +4,14 @@ import api, { getErrorMessage } from '../api/axios';
 import StatusSelect from '../components/StatusSelect';
 import FollowUpLabel from '../components/FollowUpLabel';
 import Timeline from '../components/Timeline';
+import {
+  IconArrowLeft,
+  IconStar,
+  IconEdit,
+  IconTrash,
+  IconExternalLink,
+  IconCheckCircle
+} from '../components/Icons';
 import { formatDate } from '../utils/helpers';
 
 function ApplicationDetail() {
@@ -12,8 +20,8 @@ function ApplicationDetail() {
 
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(''); // error while loading the page
-  const [actionError, setActionError] = useState(''); // error from status change / delete
+  const [error, setError] = useState('');
+  const [actionError, setActionError] = useState('');
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -56,7 +64,9 @@ function ApplicationDetail() {
   }
 
   async function handleDelete() {
-    if (!window.confirm(`Delete the application for ${application.company}?`)) return;
+    if (!window.confirm(`Are you sure you want to delete the application record for ${application.company}?`)) {
+      return;
+    }
 
     setDeleting(true);
     setActionError('');
@@ -69,13 +79,21 @@ function ApplicationDetail() {
     }
   }
 
-  if (loading) return <p className="muted" style={{ padding: '32px', textAlign: 'center' }}>Loading application details...</p>;
+  if (loading) {
+    return (
+      <div className="panel loading-state">
+        <p className="muted">Loading application details...</p>
+      </div>
+    );
+  }
 
   if (error) {
     return (
-      <div style={{ maxWidth: '600px', margin: '40px auto' }}>
+      <div className="error-container">
         <div className="alert">{error}</div>
-        <Link to="/" className="btn">← Back to applications</Link>
+        <Link to="/" className="btn btn-secondary">
+          <IconArrowLeft size={14} /> Back to Applications
+        </Link>
       </div>
     );
   }
@@ -103,38 +121,48 @@ function ApplicationDetail() {
   };
 
   return (
-    <div>
-      <p className="small" style={{ marginBottom: '16px' }}>
-        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-          ← Back to applications
+    <div className="detail-page-wrap">
+      <div className="detail-breadcrumb">
+        <Link to="/" className="breadcrumb-link">
+          <IconArrowLeft size={14} /> Back to Applications
         </Link>
-      </p>
+      </div>
 
-      <div className="page-header">
+      <div className="page-header detail-header">
         <div>
-          <h1 className="page-title">
-            <span>{application.company}</span>
-            {application.isStarred && <span className="badge-starred">⭐ Dream Company</span>}
+          <div className="detail-title-row">
+            <h1 className="page-title">{application.company}</h1>
+            {application.isStarred && (
+              <span className="badge-starred">
+                <IconStar filled size={12} aria-hidden="true" />
+                <span>Priority Target</span>
+              </span>
+            )}
             <FollowUpLabel application={application} />
-          </h1>
-          <div className="muted" style={{ fontSize: '15px', marginTop: '4px' }}>
-            {application.role}
           </div>
+          <p className="detail-role-subtitle">{application.role}</p>
         </div>
         <div className="actions">
           <button
             type="button"
-            className={`btn ${application.isStarred ? 'btn-filter-star active' : ''}`}
+            className={`btn btn-secondary ${application.isStarred ? 'btn-star-active' : ''}`}
             onClick={handleToggleStar}
-            title="Toggle dream company bookmark"
+            title={application.isStarred ? 'Remove from priority targets' : 'Bookmark as priority target'}
           >
-            <span>{application.isStarred ? '⭐ Starred' : '☆ Star'}</span>
+            <IconStar filled={Boolean(application.isStarred)} size={14} />
+            <span>{application.isStarred ? 'Priority Target' : 'Mark Priority'}</span>
           </button>
-          <Link to={`/applications/${id}/edit`} className="btn">
-            ✏️ Edit
+          <Link to={`/applications/${id}/edit`} className="btn btn-secondary">
+            <IconEdit size={14} /> Edit
           </Link>
-          <button className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
-            {deleting ? 'Deleting...' : '🗑️ Delete'}
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            <IconTrash size={14} />
+            <span>{deleting ? 'Deleting...' : 'Delete'}</span>
           </button>
         </div>
       </div>
@@ -142,25 +170,33 @@ function ApplicationDetail() {
       {actionError && <div className="alert">{actionError}</div>}
 
       {/* Visual Pipeline Stepper */}
-      <div className="pipeline-stepper">
-        {steps.map((st, idx) => (
-          <div className={getStepClass(st.key)} key={st.key}>
-            <div className="step-node">
-              {st.key === currentStatus ? '●' : idx + 1}
+      <div className="pipeline-stepper" role="region" aria-label="Application lifecycle progress">
+        {steps.map((st, idx) => {
+          const isCompleted = getStepClass(st.key).includes('completed');
+          const isActive = getStepClass(st.key).includes('active');
+          return (
+            <div className={getStepClass(st.key)} key={st.key}>
+              <div className="step-node" aria-hidden="true">
+                {isCompleted ? <IconCheckCircle size={14} /> : idx + 1}
+              </div>
+              <span className="step-label">{st.label}</span>
             </div>
-            <span className="step-label">{st.label}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="detail-layout">
-        <section className="panel">
+        <section className="panel detail-meta-panel">
           <h2 className="section-title">Application Details</h2>
           <dl className="details">
             <dt>Current Status</dt>
-            <dd style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <StatusSelect value={application.status} onChange={handleStatusChange} disabled={updating} />
-              {updating && <span className="muted small">Updating...</span>}
+            <dd className="status-update-cell">
+              <StatusSelect
+                value={application.status}
+                onChange={handleStatusChange}
+                disabled={updating}
+              />
+              {updating && <span className="muted small">Saving...</span>}
             </dd>
 
             <dt>Applied Date</dt>
@@ -169,7 +205,7 @@ function ApplicationDetail() {
             <dt>Interview Date</dt>
             <dd>
               {application.interviewDate ? (
-                <span style={{ fontWeight: 600, color: 'var(--interview)' }}>
+                <span className="interview-highlight">
                   {formatDate(application.interviewDate)}
                 </span>
               ) : (
@@ -196,9 +232,10 @@ function ApplicationDetail() {
                   href={application.jobLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ wordBreak: 'break-all' }}
+                  className="external-job-link"
                 >
-                  🔗 {application.jobLink}
+                  <span>{application.jobLink}</span>
+                  <IconExternalLink size={13} aria-hidden="true" />
                 </a>
               ) : (
                 <span className="muted">-</span>
@@ -206,12 +243,18 @@ function ApplicationDetail() {
             </dd>
 
             <dt>Personal Notes</dt>
-            <dd className="notes">{application.notes || 'No notes added yet.'}</dd>
+            <dd className="notes-block">
+              {application.notes ? (
+                <p>{application.notes}</p>
+              ) : (
+                <span className="muted">No interview preparation or recruiter notes recorded.</span>
+              )}
+            </dd>
           </dl>
         </section>
 
-        <section className="panel">
-          <h2 className="section-title">Stage History</h2>
+        <section className="panel detail-history-panel">
+          <h2 className="section-title">Status Audit Trail</h2>
           <Timeline history={application.statusHistory} />
         </section>
       </div>

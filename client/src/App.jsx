@@ -8,6 +8,9 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ApplicationForm from './pages/ApplicationForm';
 import ApplicationDetail from './pages/ApplicationDetail';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Footer from './components/Footer';
 
 function App() {
   const { user } = useAuth();
@@ -54,10 +57,13 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           {/* Unknown URL -> redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <Footer />
     </>
   );
 }

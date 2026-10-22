@@ -1,22 +1,26 @@
 import { Link } from 'react-router-dom';
 import StatusSelect from './StatusSelect';
 import FollowUpLabel from './FollowUpLabel';
+import { IconStar } from './Icons';
 import { formatDate } from '../utils/helpers';
 
-// Spreadsheet-like table of applications with Dream Star and salary badge
+// Tabular spreadsheet view of applications with Star bookmark toggle and status selection
 function ListView({ applications, onStatusChange, onToggleStar, updatingId }) {
   return (
-    <div className="table-wrap">
+    <div className="table-wrap" tabIndex="0" role="region" aria-label="Job applications table">
       <table className="table">
         <thead>
           <tr>
-            <th className="col-star" title="Dream Company Bookmark">★</th>
+            <th className="col-star" title="Priority Bookmark">
+              <span className="sr-only">Priority</span>
+              <IconStar size={14} aria-hidden="true" />
+            </th>
             <th>Company</th>
             <th>Role</th>
             <th>Location</th>
             <th>Salary / CTC</th>
-            <th>Applied</th>
-            <th>Interview</th>
+            <th>Applied Date</th>
+            <th>Interview Date</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -26,11 +30,12 @@ function ListView({ applications, onStatusChange, onToggleStar, updatingId }) {
               <td className="col-star">
                 <button
                   type="button"
-                  className={`btn-icon ${app.isStarred ? 'starred' : ''}`}
+                  className={`btn-star ${app.isStarred ? 'starred' : ''}`}
                   onClick={() => onToggleStar(app._id)}
-                  title={app.isStarred ? 'Starred as dream company' : 'Mark as dream company'}
+                  title={app.isStarred ? 'Remove from priority bookmarks' : 'Bookmark as priority target'}
+                  aria-label={app.isStarred ? `Unstar ${app.company}` : `Star ${app.company}`}
                 >
-                  {app.isStarred ? '⭐' : '☆'}
+                  <IconStar filled={Boolean(app.isStarred)} size={15} />
                 </button>
               </td>
               <td>
@@ -41,8 +46,8 @@ function ListView({ applications, onStatusChange, onToggleStar, updatingId }) {
                   <FollowUpLabel application={app} />
                 </div>
               </td>
-              <td>{app.role}</td>
-              <td>{app.location || '-'}</td>
+              <td className="cell-role">{app.role}</td>
+              <td className="cell-location">{app.location || '-'}</td>
               <td>
                 {app.salaryExpectation ? (
                   <span className="salary-tag">{app.salaryExpectation}</span>
@@ -50,8 +55,8 @@ function ListView({ applications, onStatusChange, onToggleStar, updatingId }) {
                   <span className="muted">-</span>
                 )}
               </td>
-              <td className="nowrap">{formatDate(app.appliedDate)}</td>
-              <td className="nowrap">{formatDate(app.interviewDate)}</td>
+              <td className="nowrap cell-date">{formatDate(app.appliedDate)}</td>
+              <td className="nowrap cell-date">{formatDate(app.interviewDate) || '-'}</td>
               <td>
                 <StatusSelect
                   value={app.status}
